@@ -44,11 +44,12 @@ app.post('/', (req, res) => {
 app.get('/create', (req, res) =>
 	res.sendFile(path.join(__dirname, 'index.html')))
 
-app.get('edit/:id', (req, res) => {
+app.get('/edit/:id', (req, res) => {
 	const sql ="SELECT * FROM users WHERE id = ?";
 	con.query(sql, [req.params.id], function (err, result, fields) {
 		if (err) throw err;
 		res.render('edit', {user : result});
+		console.log(result);
 	});
 });
 
