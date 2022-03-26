@@ -4,18 +4,9 @@ const bodyParser = require('body-parser')
 const ejs = require('ejs')
 const app = express()
 const port = 3000
-
-const mysql = require('mysql');
-
+const db = require('./db.js');
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true}));//미들웨어로 설정
-
-const con = mysql.createConnection({
-	host: 'localhost',
-	user: 'root',
-	password: '',
-	database: 'express_db'
-});
 
 // const sql = "INSERT INTO users(name,email) VALUES('tkim2','tkim@tkim.com')"
 
@@ -26,27 +17,28 @@ const con = mysql.createConnection({
 
 
 app.get('/', (req, res) => {
-	const sql = "select * from users";
-	con.query(sql, function (err, result, fields) {
+	const sql = "select * from user";
+	db.query(sql, function (err, result, fields) {
 		if (err) throw err;
-		res.render('index', {users : result});
+		res.render(result);
+		//console.log(result);
 	});
 });
 
-app.post('/', (req, res) => {
-	const sql = "INSERT INTO users SET ?"
-	con.query(sql, req.body, function(err, result, fields){
-		if (err) throw err;
-		console.log(result);
-		res.redirect('/');
-	});
-});
+//app.post('/', (req, res) => {
+//	const sql = "INSERT INTO users SET ?"
+//	con.query(sql, req.body, function(err, result, fields){
+//		if (err) throw err;
+//		console.log(result);
+//		res.redirect('/');
+//	});
+//});
 app.get('/create', (req, res) =>
 	res.sendFile(path.join(__dirname, 'index.html')))
 
 app.get('/edit/:id', (req, res) => {
 	const sql ="SELECT * FROM users WHERE id = ?";
-	con.query(sql, [req.params.id], function (err, result, fields) {
+	db.query(sql, [req.params.id], function (err, result, fields) {
 		if (err) throw err;
 		res.render('edit', {user : result});
 		console.log(result);
@@ -55,7 +47,7 @@ app.get('/edit/:id', (req, res) => {
 
 app.post('/update/:id', (req, res) => {
 	const sql = "UPDATE users SET ? WHERE id = " + req.params.id;
-	con.query(sql, req.body, function (err, result, fields) {
+	db.query(sql, req.body, function (err, result, fields) {
 		if (err) throw err;
 		console.log(result);
 		res.redirect('/');
@@ -64,7 +56,7 @@ app.post('/update/:id', (req, res) => {
 
 app.get('/delete/:id', (req, res) => {
 	const sql = "DELETE FROM users WHERE id = ?";
-	con.query(sql, [req.params.id], function(err, result, fields) {
+	db.query(sql, [req.params.id], function(err, result, fields) {
 		if (err) throw err;
 		console.log(result);
 		res.redirect('/');
